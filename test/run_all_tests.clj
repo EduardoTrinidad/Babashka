@@ -1,17 +1,18 @@
-(ns run-all-tests 
+(ns run-all-tests
   (:require [clojure.test :refer :all]
             [babashka.pods :as pods]))
 
-;; Cargar el pod una sola vez
-(pods/load-pod "./result/bin/babashka-pod-docker.exe")
+;; Detecta si estás en Windows o Linux
+(def os-name (System/getProperty "os.name"))
+(def pod-path (if (.startsWith os-name "Windows")
+                "./result/bin/babashka-pod-docker.exe"
+                "./result/bin/babashka-pod-docker"))
 
-;; Requerir los archivos de prueba
+(pods/load-pod pod-path)
+
 (require '[test-basic])
 (require '[test-images])
 (require '[test-utils])
 
-;; Ejecutar todas las pruebas
 (run-tests 'test-basic 'test-images 'test-utils)
-
-;; Mensaje al terminar
 (println "Todas las pruebas se ejecutaron correctamente.")
