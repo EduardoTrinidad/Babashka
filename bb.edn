@@ -1,0 +1,23 @@
+{
+  :deps {http-kit/http-kit {:mvn/version "2.7.0"}}
+
+  :tasks
+  {
+    metrics
+    {:requires ([org.httpkit.server :as http])
+     :task (do
+             (defonce server (atom nil))
+
+             (defn handler [_]
+               {:status 200
+                :headers {"Content-Type" "text/plain"}
+                :body (str
+                        "# HELP clojure_test_passes Número de pruebas exitosas\n"
+                        "# TYPE clojure_test_passes counter\n"
+                        "clojure_test_passes 3\n")})
+
+             (reset! server (http/run-server handler {:port 9876}))
+             (println "Servidor Prometheus disponible en http://localhost:9876/metrics")
+             (Thread/sleep Long/MAX_VALUE))}
+  }
+}

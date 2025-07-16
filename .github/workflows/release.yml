@@ -1,31 +1,75 @@
-name: Release
+name: Release and Docker Build
 
 on:
   push:
-    branches:
+    tags:
       - '*'
 
+env:
+  IMAGE_NAME: docker/babashka-pod-docker
+
 jobs:
-  releases-matrix:
-    name: Release Go Binary
+  test-and-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Babashka
+        uses: DeLaGuardo/setup-clojure@10.0
+        with:
+          bb: latest
+
+      - name: Run Clojure tests
+        run: bb run_all_tests.clj
+
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: dockerbuildbot
+          password: ${{ secrets.DOCKERBUILDBOT_WRITE_PAT }}
+
+      - name: Extract Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.IMAGE_NAME }}
+          tags: |
+            latest
+            ${{ github.ref_name }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+  build-go-binaries:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        # build and publish in parallel: linux/386, linux/amd64, linux/arm64, windows/386, windows/amd64, darwin/amd64, darwin/arm64
         goos: [linux, windows, darwin]
         goarch: [amd64, arm64]
         exclude:
           - goarch: arm64
             goos: windows
     steps:
-    - uses: actions/checkout@v3
-    - uses: wangyoucao577/go-release-action@v1.35
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        goos: ${{ matrix.goos }}
-        goarch: ${{ matrix.goarch }}
-        goversion: 1.19.1
-        binary_name: "babashka-pod-docker"
-        release_tag: "0.2.0"
-        overwrite: TRUE
-        compress_assets: OFF
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Build and release Go binaries
+        uses: wangyoucao577/go-release-action@v1.35
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          goos: ${{ matrix.goos }}
+          goarch: ${{ matrix.goarch }}
+          goversion: 1.19.1
+          binary_name: "babashka-pod-docker"
+          release_tag: ${{ github.ref_name }}
+          overwrite: true
+          compress_assets: off

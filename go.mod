@@ -1,6 +1,8 @@
 module babashka-pod-docker
 
-go 1.21
+go 1.21.6
+
+toolchain go1.24.4
 
 require (
 	github.com/atomist-skills/go-skill v0.0.56
