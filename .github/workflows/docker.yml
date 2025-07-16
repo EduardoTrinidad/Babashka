@@ -23,7 +23,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.21'
+          go-version: '1.19'
 
       - name: Build Babashka Pod binary
         run: |
@@ -31,6 +31,8 @@ jobs:
           GOOS=linux GOARCH=amd64 go build -o result/bin/babashka-pod-docker .
 
       - name: Install Babashka
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           gh release download --repo babashka/babashka --pattern "babashka-*-linux-amd64.tar.gz"
           FILE=$(ls babashka-*-linux-amd64.tar.gz)
