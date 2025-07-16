@@ -32,8 +32,9 @@ jobs:
 
       - name: Install Babashka
         run: |
-          curl -LO https://github.com/babashka/babashka/releases/latest/download/babashka-linux-amd64.zip
-          unzip babashka-linux-amd64.zip
+          gh release download --repo babashka/babashka --pattern "babashka-*-linux-amd64.tar.gz"
+          FILE=$(ls babashka-*-linux-amd64.tar.gz)
+          tar -xzf "$FILE"
           sudo mv bb /usr/local/bin/
           bb --version
 
