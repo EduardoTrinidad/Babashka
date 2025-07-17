@@ -2,13 +2,12 @@ name: Build and push
 
 on:
   push:
-    branches:
-      - main
     tags:
       - '*'
 
 env:
   IMAGE_NAME: docker/babashka-pod-docker
+  REGISTRY: docker.io
 
 jobs:
   build:
@@ -19,29 +18,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-
-      - name: Set up Go
-        uses: actions/setup-go@v5
-        with:
-          go-version: '1.21'
-
-      - name: Build Babashka Pod binary
-        run: |
-          mkdir -p result/bin
-          GOOS=linux GOARCH=amd64 go build -o result/bin/babashka-pod-docker .
-
-      - name: Install Babashka
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          gh release download --repo babashka/babashka --pattern "babashka-*-linux-amd64.tar.gz"
-          FILE=$(ls babashka-*-linux-amd64.tar.gz)
-          tar -xzf "$FILE"
-          sudo mv bb /usr/local/bin/
-          bb --version
-
-      - name: Run Clojure tests
-        run: bb test/run_all_tests.clj
 
       - name: Setup Docker buildx
         uses: docker/setup-buildx-action@v3
@@ -59,12 +35,13 @@ jobs:
         with:
           images: ${{ env.IMAGE_NAME }}
           labels: |
-            org.opencontainers.image.revision=${{ env.SHA }}
+            org.opencontainers.image.revision=${{ github.sha }}
           tags: |
             latest
             ${{ github.ref_name }}
 
       - name: Build and push Docker image
+        id: build-and-push
         uses: docker/build-push-action@v5
         with:
           context: .

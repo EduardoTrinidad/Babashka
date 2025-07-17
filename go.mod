@@ -1,4 +1,4 @@
-module github.com/EduardoTrinidad/Babashka
+module babashka-pod-docker
 
 go 1.21.6
 
