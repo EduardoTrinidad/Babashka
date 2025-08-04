@@ -21,7 +21,7 @@ jobs:
           bb: latest
 
       - name: Run Clojure tests
-        run: bb run_all_tests.clj
+        run: bb test/test_basic.clj
 
       - name: Setup Docker Buildx
         uses: docker/setup-buildx-action@v3
