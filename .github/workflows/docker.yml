@@ -6,7 +6,7 @@ on:
       - '*'
 
 env:
-  IMAGE_NAME: docker/babashka-pod-docker
+  IMAGE_NAME: eduardot0/babashka-pod-docker
   REGISTRY: docker.io
 
 jobs:
@@ -49,4 +49,3 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          
