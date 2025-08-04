@@ -73,7 +73,7 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           goos: ${{ matrix.goos }}
           goarch: ${{ matrix.goarch }}
-          goversion: 1.19.1
+          goversion: 1.21.6
           binary_name: "babashka-pod-docker"
           release_tag: ${{ github.ref_name }}
           overwrite: true
