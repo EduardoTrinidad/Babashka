@@ -3,10 +3,10 @@
             [babashka.pods :as pods]))
 
 ;; Cargar el pod
-(pods/load-pod "./result/bin/babashka-pod-docker.exe")
+(pods/load-pod "./result/bin/babashka-pod-docker")
 (require '[docker.tools :as docker])
 
-(println "🧪 Ejecutando prueba: parse-image-name con tag...")
+(println "Ejecutando prueba: parse-image-name con tag...")
 
 (deftest test-parse-image-name
   (testing "parse-image-name with tag"
@@ -15,4 +15,6 @@
 
 (run-tests)
 
-(println "✅ Prueba ejecutada correctamente.")
+(println "Prueba ejecutada correctamente.")
+
+;;Prueba de sintaxis 
